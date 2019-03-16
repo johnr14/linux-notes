@@ -1,0 +1,40 @@
+Convert a video to mkv and attatch a specific thumbnail :
+-attach cover.jpg -metadata:s:t mimetype=image/jpeg
+
+ffmpeg -i 0052-12188.mp4 -pass 1 -c:v libvpx-vp9 \ 
+-preset slow -b:v 1400K -crf 33 -threads 16 -coder 1 \ 
+-tile-columns 6 -frame-parallel 1\ 
+-pix_fmt yuv420p -movflags +faststart -g 30 -bf 2 \
+-an -f webm /dev/null
+
+ffmpeg -i 0052-12188.mp4 -c:v libvpx-vp9 -pass 1 -b:v 1400K -threads 16 -speed 4 \
+  -tile-columns 0 -frame-parallel 0 -auto-alt-ref 1 -lag-in-frames 25 \
+  -g 9999 -aq-mode 0 -an -f webm /dev/null
+
+#PASS 2
+ffmpeg -i 0052-12188.mp4 -attach Screenshot_20190315_180200.png -metadata:s:t mimetype=image/jpeg -c:v libvpx-vp9 -pass 2 -preset slow -b:v 1400K -crf 33 -threads 16 -coder 1 -pix_fmt yuv420p -movflags +faststart -g 30 -bf 2 -c:a libopus -b:a 64k BushGarden-2018.webm   
+ffmpeg -i 0052-12188.mp4 -attach Screenshot_20190315_180200.png -metadata:s:t mimetype=image/jpeg -c:v libvpx-vp9 -pass 2 -b:v 1400K -threads 16 -speed 0 \
+  -tile-columns 0 -frame-parallel 0 -auto-alt-ref 1 -lag-in-frames 25 -g 9999 -aq-mode 0 -c:a libopus -b:a 64k -f webm out.webm
+  
+  
+  ffmpeg -i 0052-12188.mp4 -attach Screenshot_20190315_180200.png -metadata:s:t mimetype=image/jpeg -c:v libvpx-vp9 -pass 2 -b:v 1400K -r 24 -threads 16 -speed 3 -tile-columns 6 -frame-parallel 1 -vf setsar=1:1 -auto-alt-ref 1 -lag-in-frames 25 -crf 30 -aq-mode 0 -c:a libopus -b:a 64k -movflags +faststart -f webm out.webm
+  
+ 
+Quality
+Example flag: -crf 20.
+
+0 is lossless, 23 is default, and 51 is worst possible. 18-28 is a sane range.
+
+All device compatibility
+Flag: -profile:v baseline -level 3.0.
+
+Fast start
+Flag: -movflags +faststart.
+
+Moves some data to the beginning of the file, allowing the video to be played before it is completely downloaded.
+
+Flag: -pix_fmt yuv420p.
+
+Note: Requires dimensions to be divisible by 2.
+
+
